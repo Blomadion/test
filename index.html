@@ -9,6 +9,7 @@
             height: 100%; 
             margin: 0; 
             overflow: hidden; 
+            background: #000;
         }
         #bg {
             position: fixed;
@@ -34,10 +35,11 @@
         .error {
             display: none;
             color: red;
-            background: white;
+            background: rgba(255,255,255,0.8);
             padding: 15px;
             border-radius: 5px;
             margin-top: 20px;
+            max-width: 80%;
         }
     </style>
 </head>
@@ -49,10 +51,9 @@
         <div id="error" class="error"></div>
     </div>
 
-    <!-- Three.js с совместимыми версиями -->
+    <!-- Three.js с фиксированными версиями -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/objects/MarchingCubes.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -60,14 +61,24 @@
             const canvas = document.getElementById('bg');
             
             // Проверка поддержки WebGL
-            if (!window.WebGLRenderingContext || !canvas) {
-                errorEl.style.display = 'block';
-                errorEl.textContent = 'Ваш браузер не поддерживает WebGL. Попробуйте Chrome или Firefox';
+            if (!window.WebGLRenderingContext) {
+                showError("Ваш браузер не поддерживает WebGL. Попробуйте Chrome или Firefox");
+                return;
+            }
+            
+            if (!canvas) {
+                showError("Не найден canvas элемент");
+                return;
+            }
+
+            // Проверка загрузки Three.js
+            if (!window.THREE || !THREE.MarchingCubes) {
+                showError("Не удалось загрузить Three.js библиотеки");
                 return;
             }
 
             try {
-                // Инициализация Three.js
+                // Инициализация рендерера
                 const renderer = new THREE.WebGLRenderer({
                     canvas: canvas,
                     antialias: true,
@@ -82,12 +93,12 @@
 
                 // Создание материала металла
                 const metalMaterial = new THREE.MeshPhysicalMaterial({
-                    color: 0xcccccc,
+                    color: 0xaaaaaa,
                     metalness: 1.0,
-                    roughness: 0.1,
+                    roughness: 0.15,
                     clearcoat: 1.0,
                     clearcoatRoughness: 0.2,
-                    envMapIntensity: 1.5
+                    envMapIntensity: 1.2
                 });
 
                 // Инициализация Marching Cubes
@@ -101,15 +112,15 @@
                 // Параметры анимации
                 const params = {
                     numBlobs: 8,
-                    speed: 0.5,
-                    strength: 0.3,
-                    subtract: 10
+                    speed: 0.4,
+                    strength: 0.35,
+                    subtract: 12
                 };
 
                 // Анимация
                 const clock = new THREE.Clock();
                 
-                function animateMetaballs() {
+                function animate() {
                     const time = clock.getElapsedTime();
                     effect.reset();
                     
@@ -130,7 +141,7 @@
                     
                     effect.rotation.y = time * 0.1;
                     renderer.render(scene, camera);
-                    requestAnimationFrame(animateMetaballs);
+                    requestAnimationFrame(animate);
                 }
 
                 // Обработка изменения размера
@@ -141,12 +152,19 @@
                 });
 
                 // Запуск анимации
-                animateMetaballs();
+                animate();
 
             } catch (e) {
-                errorEl.style.display = 'block';
-                errorEl.textContent = `Ошибка: ${e.message}`;
+                showError(`Ошибка: ${e.message}`);
                 console.error(e);
+            }
+            
+            function showError(msg) {
+                if (errorEl) {
+                    errorEl.style.display = 'block';
+                    errorEl.textContent = msg;
+                }
+                console.error(msg);
             }
         });
     </script>
