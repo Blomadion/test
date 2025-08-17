@@ -31,30 +31,23 @@ scene.add(highlightLight);
 // Массив сфер
 const spheres = [];
 const baseRadius = 80;     
-const numSpheres = 30;
+const numSpheres = 100; // увеличиваем количество сфер
 
 for (let i = 0; i < numSpheres; i++) {
-  let size;
-  if (Math.random() < 0.3) {
-    size = Math.random() * 4 + 2;   
-  } else if (Math.random() < 0.6) {
-    size = Math.random() * 6 + 4;  
-  } else {
-    size = Math.random() * 8 + 6;  
-  }
+  let size = Math.random() * 2 + 1; // уменьшаем размер сфер до 1-3
 
   const geometry = new THREE.SphereGeometry(size, 32, 32);
   const material = new THREE.MeshStandardMaterial({
-    color: 0x000000,        
-    roughness: 0.1,          
-    metalness: 1.0,          
-    transparent: false       
+    color: 0x000000,
+    roughness: 0.1,
+    metalness: 1.0,
+    transparent: false
   });
   const sphere = new THREE.Mesh(geometry, material);
 
   const angle = (i / numSpheres) * Math.PI * 2 + (Math.random() * 0.4 - 0.2);
   const radius = baseRadius + (Math.random() * 20 - 10); 
-  const speed = 0.0004 + Math.random() * 0.001;
+  const speed = Math.random() * 0.002 + 0.001; // увеличиваем диапазон скорости для разнообразия
 
   spheres.push({ mesh: sphere, angle, radius, speed });
   scene.add(sphere);
@@ -68,7 +61,7 @@ function animate() {
     s.angle += s.speed;
     const x = Math.cos(s.angle) * s.radius;
     const y = Math.sin(s.angle) * s.radius;
-    s.mesh.position.set(x, y, Math.sin(s.angle * 1.3) * 25);
+    s.mesh.position.set(x, y, Math.sin(s.angle * 1.3) * 15); // изменяем высоту для большего эффекта
   });
 
   renderer.render(scene, camera);
