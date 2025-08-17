@@ -1,0 +1,50 @@
+/* Общие правила */
+* {
+  box-sizing: border-box;
+}
+
+body, main {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  color: white;
+}
+
+/* Элемент фона */
+.background-image {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('your_background_image.jpg'); /* Ваше изображение */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: filter 0.5s ease-in-out, transform 0.5s ease-in-out;
+  will-change: filter, transform;
+  z-index: -1;
+}
+
+/* Оформление основного контента */
+main {
+  padding-top: 100px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 3em;
+  margin-bottom: 20px;
+}
+
+p {
+  font-size: 1.5em;
+  line-height: 1.5;
+}
+
+/* Canvas для трехмерных объектов */
+canvas {
+  display: block;
+}
