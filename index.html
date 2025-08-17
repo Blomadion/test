@@ -1,92 +1,85 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Металлические абстракции — отражения</title>
+  <meta charset="UTF-8">
+  <title>Маникюр</title>
   <style>
-    body{
-      margin:0; background:#f2f2f4; overflow:hidden;
-      height:100vh; width:100vw;
+    body {
+      margin: 0;
+      background: #e5e5e5;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
     }
-    canvas{width:100%; height:100%; display:block}
+    #text {
+      position: absolute;
+      z-index: 2;
+      font-size: 48px;
+      font-family: Arial, sans-serif;
+      font-weight: 600;
+      color: #333;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
   </style>
 </head>
 <body>
-<canvas id="c"></canvas>
-
-<script type="module">
-  import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-
-  const canvas = document.getElementById('c');
-  const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
-  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xf2f2f4);
-
-  const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 100);
-  camera.position.set(0, 0.6, 6);
-
-  // lights
-  const hemi = new THREE.HemisphereLight(0xffffff, 0xaaaaaa, 0.8);
-  scene.add(hemi);
-  const dir1 = new THREE.DirectionalLight(0xffffff, 1.0);
-  dir1.position.set(5,6,5);
-  scene.add(dir1);
-
-  // === окружение для отражений ===
-  const loader = new THREE.CubeTextureLoader();
-  const envMap = loader.load([
-    "https://threejs.org/examples/textures/cube/skyboxsun25deg/px.jpg",
-    "https://threejs.org/examples/textures/cube/skyboxsun25deg/nx.jpg",
-    "https://threejs.org/examples/textures/cube/skyboxsun25deg/py.jpg",
-    "https://threejs.org/examples/textures/cube/skyboxsun25deg/ny.jpg",
-    "https://threejs.org/examples/textures/cube/skyboxsun25deg/pz.jpg",
-    "https://threejs.org/examples/textures/cube/skyboxsun25deg/nz.jpg"
-  ]);
-  scene.environment = envMap;
-
-  // metallic material with real reflections
-  const mat = new THREE.MeshPhysicalMaterial({
-    metalness: 1.0,
-    roughness: 0.15,
-    clearcoat: 1.0,
-    clearcoatRoughness: 0.1,
-    reflectivity: 1.0,
-    envMapIntensity: 1.0,
-    color: 0xffffff
-  });
-
-  // add 3 smaller shapes
-  const shapes = [];
-  for (let i=0;i<3;i++){
-    const geo = new THREE.TorusKnotGeometry(0.4+Math.random()*0.2, 0.12, 180, 12, Math.floor(Math.random()*2+2), Math.floor(Math.random()*2+3));
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set((i-1)*2, 0, 0);
-    scene.add(mesh);
-    shapes.push(mesh);
-  }
-
-  // animate
-  function animate(){
-    requestAnimationFrame(animate);
-    shapes.forEach((m,idx)=>{
-      m.rotation.x += 0.01*(idx+1);
-      m.rotation.y += 0.013*(idx+1);
-    });
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  window.addEventListener('resize',()=>{
+  <div id="text">Маникюр</div>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+  <script>
+    // Сцена
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-  });
-</script>
+    document.body.appendChild(renderer.domElement);
+
+    // Свет
+    const light = new THREE.PointLight(0xffffff, 1.5);
+    light.position.set(10, 10, 10);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x888888));
+
+    // Сферы
+    const spheres = [];
+    const geometry = new THREE.SphereGeometry(0.3, 32, 32);
+    const material = new THREE.MeshStandardMaterial({color: 0x111111, metalness: 0.8, roughness: 0.2});
+
+    for (let i = 0; i < 30; i++) {
+      const sphere = new THREE.Mesh(geometry, material);
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 4 + Math.random() * 2;
+      sphere.position.set(Math.cos(angle) * radius, Math.sin(angle) * radius, (Math.random()-0.5)*4);
+      sphere.scale.setScalar(Math.random()*1.5 + 0.3);
+      scene.add(sphere);
+      spheres.push(sphere);
+    }
+
+    camera.position.z = 10;
+
+    // Анимация
+    function animate() {
+      requestAnimationFrame(animate);
+      spheres.forEach((s, i) => {
+        s.rotation.x += 0.01;
+        s.rotation.y += 0.01;
+      });
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Адаптив
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
 </body>
 </html>
