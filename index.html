@@ -6,7 +6,7 @@
   <style>
     body {
       margin: 0;
-      background: #d9d9d9; /* Серый фон */
+      background: #d9d9d9; /* серый фон */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -20,16 +20,15 @@
       width: 400px;
       height: 400px;
       border-radius: 50%;
-      animation: rotate 20s linear infinite; /* плавное вращение */
+      animation: rotate 30s linear infinite;
     }
 
     .sphere {
       position: absolute;
-      width: 40px;
-      height: 40px;
       background: #222; /* матовый черный */
       border-radius: 50%;
-      box-shadow: inset -5px -5px 10px rgba(0,0,0,0.4), inset 5px 5px 10px rgba(255,255,255,0.1);
+      box-shadow: inset -5px -5px 10px rgba(0,0,0,0.4),
+                  inset 5px 5px 10px rgba(255,255,255,0.08);
     }
 
     .text {
@@ -55,17 +54,30 @@
 
   <script>
     const circle = document.getElementById('circle');
-    const numSpheres = 20;  // количество шариков
-    const radius = 180;     // радиус окружности
+    const numSpheres = 25;   // кол-во шариков
+    const radius = 170;      // радиус окружности
 
     for (let i = 0; i < numSpheres; i++) {
       const sphere = document.createElement('div');
       sphere.className = 'sphere';
-      const angle = (i / numSpheres) * (2 * Math.PI);
-      const x = Math.cos(angle) * radius + 200 - 20; // 200 = центр контейнера, 20 = радиус шара
-      const y = Math.sin(angle) * radius + 200 - 20;
+
+      // Случайный размер (от маленьких до крупных)
+      const size = Math.random() * 35 + 15; 
+      sphere.style.width = `${size}px`;
+      sphere.style.height = `${size}px`;
+
+      // Угол с небольшим случайным отклонением
+      const angle = (i / numSpheres) * (2 * Math.PI) + (Math.random() * 0.3 - 0.15);
+
+      // Радиус с небольшим разбросом (чтобы не было идеально)
+      const r = radius + (Math.random() * 20 - 10);
+
+      const x = Math.cos(angle) * r + 200 - size/2;
+      const y = Math.sin(angle) * r + 200 - size/2;
+
       sphere.style.left = `${x}px`;
       sphere.style.top = `${y}px`;
+
       circle.appendChild(sphere);
     }
   </script>
