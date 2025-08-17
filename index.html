@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Эффекты фона и анимации</title>
+  <title>Исправленное сочетание эффектов</title>
   <style>
     * {
       box-sizing: border-box;
@@ -24,7 +24,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: url('your_background_image.jpg'); /* Здесь ваше изображение */
+      background-image: url('your_background_image.jpg'); /* Замените на свою картинку */
       background-position: center;
       background-repeat: no-repeat;
       background-size: cover;
@@ -60,25 +60,24 @@
   <!-- Основной контент -->
   <main>
     <h1>Привет!</h1>
-    <p>Пример комбинированного поведения с анимациями и изменением фона.</p>
+    <p>Объединённые эффекты с анимацией и фоном.</p>
     
-    <!-- Для тестирования прокрутки добавляем секцию -->
-    <section style="height: 1000px;">Достаточно пространства для теста прокрутки...</section>
+    <!-- Пространство для прокрутки -->
+    <section style="height: 1000px;">Тестовая область для прокрутки...</section>
   </main>
 
-  <!-- Canvas для трехмерных фигур -->
+  <!-- Canvas для рисования -->
   <canvas></canvas>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
   <script>
-    // === ИНИЦИАЛИЗАЦИЯ SCENE, CAMERA, RENDERER ДЛЯ SFЕР === //
+    // ИНИЦИАЛИЗАЦИЯ TRIANGULAR MESH
     const scene = new THREE.Scene();
 
-    // --- Туман (Fog) ---
+    // ---- ТУМАН -----
     scene.fog = new THREE.Fog(0xd9d9d9, 200, 450); 
-    // ближе чем 200 - без тумана, дальше 450 - растворяются
 
-    // Камера
+    // КАМЕРА
     const camera = new THREE.PerspectiveCamera(
       60,
       window.innerWidth / window.innerHeight,
@@ -87,13 +86,13 @@
     );
     camera.position.z = 350;
 
-    // Рендерер
+    // РЕНДЕРЕР
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0xd9d9d9, 1); // фон = туман
+    renderer.setClearColor(0xd9d9d9, 1); 
     document.body.appendChild(renderer.domElement);
 
-    // Свет
+    // ОСВЕЩЕНИЕ
     const ambient = new THREE.AmbientLight(0xffffff, 0.3);
     scene.add(ambient);
 
@@ -105,14 +104,14 @@
     subtleLight.position.set(-200, -150, 100);
     scene.add(subtleLight);
 
-    // Верхний свет для акцентирования бликов
+    // ДОПОЛНИТЕЛЬНЫЙ СВЕТ НАВЕРХУ
     const highlightLight = new THREE.PointLight(0xffffff, 1.0, 500);
     highlightLight.position.set(0, 400, 0);
     scene.add(highlightLight);
 
-    // СФЕРЫ
+    // СОЗДАЕМ МАССИВ СПИРАЛЬНОГО РАСПРЕДЕЛЕНИЯ СФЕР
     const spheres = [];
-    const baseRadius = 80;       
+    const baseRadius = 80;     
     const numSpheres = 30;
 
     for (let i = 0; i < numSpheres; i++) {
@@ -142,7 +141,7 @@
       scene.add(sphere);
     }
 
-    // Анимация сферами
+    // АНАЛОГИЧНАЯ ФУНКЦИЯ АНИМАЦИИ
     function animate() {
       requestAnimationFrame(animate);
 
@@ -156,31 +155,31 @@
       renderer.render(scene, camera);
     }
 
-    animate(); // запуск анимации
+    animate(); // Запускаем цикл анимации
 
-    // ==== ОБРАБОТКА ПРОКРУТКИ ПРИ ФОНЕ ===== //
+    // ОТОБРАЖЕНИЕ ФОНА ПРИ СКРОЛЛИНГЕ
     document.addEventListener('scroll', handleScroll);
 
-    // Обработка прокрутки
+    // Логика обработки прокрутки
     function handleScroll() {
       const scrollY = window.scrollY || window.pageYOffset;
       const maxOpacity = 1;            
-      const minOpacity = 0.2;           
+      const minOpacity = 0.2;          
       const maxDistance = 500;         
       const blurAmount = 10;           
 
-      // Новая прозрачность и смещение согласно позиции прокрутки
+      // Рассчитываем новое состояние фона
       const currentOpacity = Math.max(minOpacity, maxOpacity - scrollY / maxDistance);
       const translateZValue = -(scrollY * 0.05); 
 
-      // Меняем свойства фона
+      // Применяем стили
       const bgImage = document.querySelector('.background-image');
       bgImage.style.filter = `blur(${blurAmount * (1 - currentOpacity)}px)`; 
       bgImage.style.transform = `translateZ(${translateZValue}px)`; 
       bgImage.style.opacity = `${currentOpacity}`;
     }
 
-    // === АДАПТИВНОСТЬ === //
+    // ОБРАБОТЧИК РЕЗИСКЕЙЛА ОКНА
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
