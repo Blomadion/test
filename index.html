@@ -21,6 +21,7 @@
       font-family: Arial, sans-serif;
       color: #333;
       text-align: center;
+      pointer-events: none;
     }
     canvas {
       display: block;
@@ -40,7 +41,7 @@
       0.1,
       1000
     );
-    camera.position.z = 400;
+    camera.position.z = 350;
 
     // Рендерер
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -48,34 +49,42 @@
     document.body.appendChild(renderer.domElement);
 
     // Свет
-    const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambient);
     const light = new THREE.PointLight(0xffffff, 1.2);
-    light.position.set(200, 200, 300);
+    light.position.set(150, 200, 300);
     scene.add(light);
 
     // Сферы
     const spheres = [];
-    const baseRadius = 180;
-    const numSpheres = 30;
+    const baseRadius = 120;   // уменьшенный радиус
+    const numSpheres = 28;
 
     for (let i = 0; i < numSpheres; i++) {
-      // размеры меньше: от 8px до 30px
-      const size = (Math.random() < 0.25)
-        ? Math.random() * 15 + 25   // чуть крупнее
-        : Math.random() * 12 + 8;   // мелкие
+      // разные размеры: часть маленькие (фон), часть крупнее (передний план)
+      let size;
+      if (Math.random() < 0.3) {
+        size = Math.random() * 8 + 6;   // мелкие фоновые
+      } else if (Math.random() < 0.6) {
+        size = Math.random() * 15 + 12; // средние
+      } else {
+        size = Math.random() * 20 + 20; // чуть крупнее
+      }
 
       const geometry = new THREE.SphereGeometry(size, 32, 32);
       const material = new THREE.MeshStandardMaterial({
-        color: 0x555555,  // серые сферы
+        color: 0x666666,  // серый
         roughness: 1.0,   // матовые
-        metalness: 0.0
+        metalness: 0.0,
+        transparent: true,
+        opacity: size < 10 ? 0.5 : 1 // маленькие шары тусклее (фон)
       });
       const sphere = new THREE.Mesh(geometry, material);
 
-      const angle = (i / numSpheres) * Math.PI * 2 + (Math.random() * 0.3 - 0.15);
-      const radius = baseRadius + (Math.random() * 70 - 35);
-      const speed = 0.0015 + Math.random() * 0.002;
+      // параметры орбиты
+      const angle = (i / numSpheres) * Math.PI * 2 + (Math.random() * 0.4 - 0.2);
+      const radius = baseRadius + (Math.random() * 40 - 20);
+      const speed = 0.001 + Math.random() * 0.002;
 
       spheres.push({ mesh: sphere, angle, radius, speed });
       scene.add(sphere);
@@ -89,7 +98,7 @@
         s.angle += s.speed;
         const x = Math.cos(s.angle) * s.radius;
         const y = Math.sin(s.angle) * s.radius;
-        s.mesh.position.set(x, y, Math.sin(s.angle * 2) * 25); // глубина слабее
+        s.mesh.position.set(x, y, Math.sin(s.angle * 1.5) * 20); // чуть глубины
       });
 
       renderer.render(scene, camera);
