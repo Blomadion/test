@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Металлические абстракции — маленькие формы</title>
+  <title>Металлические абстракции — отражения</title>
   <style>
     body{
       margin:0; background:#f2f2f4; overflow:hidden;
-      height:100vh; display:flex; align-items:center; justify-content:center;
+      height:100vh; width:100vw;
     }
     canvas{width:100%; height:100%; display:block}
   </style>
@@ -17,7 +17,6 @@
 
 <script type="module">
   import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
-  import { TextureLoader } from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
   const canvas = document.getElementById('c');
   const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
@@ -29,47 +28,50 @@
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf2f2f4);
 
-  const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
-  camera.position.set(0, 1.2, 8);
+  const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 100);
+  camera.position.set(0, 0.6, 6);
 
   // lights
-  const hemi = new THREE.HemisphereLight(0xffffff, 0xaaaaaa, 0.9);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xaaaaaa, 0.8);
   scene.add(hemi);
-  const dir1 = new THREE.DirectionalLight(0xffffff, 1.2);
+  const dir1 = new THREE.DirectionalLight(0xffffff, 1.0);
   dir1.position.set(5,6,5);
   scene.add(dir1);
-  const dir2 = new THREE.DirectionalLight(0xffffff, 0.6);
-  dir2.position.set(-4,-3,-5);
-  scene.add(dir2);
 
-  // load a subtle metal texture (brushed steel style)
-  const texLoader = new TextureLoader();
-  const metalTex = texLoader.load("https://threejs.org/examples/textures/metal.jpg");
-  metalTex.wrapS = metalTex.wrapT = THREE.RepeatWrapping;
-  metalTex.repeat.set(2,2);
+  // === окружение для отражений ===
+  const loader = new THREE.CubeTextureLoader();
+  const envMap = loader.load([
+    "https://threejs.org/examples/textures/cube/skyboxsun25deg/px.jpg",
+    "https://threejs.org/examples/textures/cube/skyboxsun25deg/nx.jpg",
+    "https://threejs.org/examples/textures/cube/skyboxsun25deg/py.jpg",
+    "https://threejs.org/examples/textures/cube/skyboxsun25deg/ny.jpg",
+    "https://threejs.org/examples/textures/cube/skyboxsun25deg/pz.jpg",
+    "https://threejs.org/examples/textures/cube/skyboxsun25deg/nz.jpg"
+  ]);
+  scene.environment = envMap;
 
-  // metallic material with texture
+  // metallic material with real reflections
   const mat = new THREE.MeshPhysicalMaterial({
     metalness: 1.0,
-    roughness: 0.25,
+    roughness: 0.15,
     clearcoat: 1.0,
-    clearcoatRoughness: 0.15,
+    clearcoatRoughness: 0.1,
     reflectivity: 1.0,
-    map: metalTex,
-    envMapIntensity: 1.0
+    envMapIntensity: 1.0,
+    color: 0xffffff
   });
 
   // add 3 smaller shapes
   const shapes = [];
   for (let i=0;i<3;i++){
-    const geo = new THREE.TorusKnotGeometry(0.6+Math.random()*0.3, 0.18, 220, 16, Math.floor(Math.random()*3+2), Math.floor(Math.random()*3+3));
+    const geo = new THREE.TorusKnotGeometry(0.4+Math.random()*0.2, 0.12, 180, 12, Math.floor(Math.random()*2+2), Math.floor(Math.random()*2+3));
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.set((i-1)*2.2, 0, 0);
+    mesh.position.set((i-1)*2, 0, 0);
     scene.add(mesh);
     shapes.push(mesh);
   }
 
-  // animate (rotation only, no floating)
+  // animate
   function animate(){
     requestAnimationFrame(animate);
     shapes.forEach((m,idx)=>{
