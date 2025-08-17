@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Исправленное сочетание эффектов</title>
+  <title>Исправленные эффекты с прокруткой</title>
   <style>
     * {
       box-sizing: border-box;
@@ -24,7 +24,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-image: url('your_background_image.jpg'); /* Замените на свою картинку */
+      background-image: url('your_background_image.jpg'); /* Укажите вашу картинку */
       background-position: center;
       background-repeat: no-repeat;
       background-size: cover;
@@ -57,24 +57,24 @@
   <!-- Элемент фона -->
   <div class="background-image"></div>
 
-  <!-- Основной контент -->
+  <!-- Основная зона контента -->
   <main>
-    <h1>Привет!</h1>
-    <p>Объединённые эффекты с анимацией и фоном.</p>
+    <h1>Добро пожаловать!</h1>
+    <p>Посмотри на потрясающие анимированные сферы и прокрути страницу вниз:</p>
     
-    <!-- Пространство для прокрутки -->
-    <section style="height: 1000px;">Тестовая область для прокрутки...</section>
+    <!-- Пространство для демонстрации прокрутки -->
+    <section style="height: 1000px;">Здесь достаточно места для прокрутки...</section>
   </main>
 
-  <!-- Canvas для рисования -->
+  <!-- Canvas для анимированных сфер -->
   <canvas></canvas>
 
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
   <script>
-    // ИНИЦИАЛИЗАЦИЯ TRIANGULAR MESH
+    // ИНИЦИАЛИЗАЦИЯ SCENE, CAMERA, RENDERER
     const scene = new THREE.Scene();
 
-    // ---- ТУМАН -----
+    // ТУМАН
     scene.fog = new THREE.Fog(0xd9d9d9, 200, 450); 
 
     // КАМЕРА
@@ -104,12 +104,12 @@
     subtleLight.position.set(-200, -150, 100);
     scene.add(subtleLight);
 
-    // ДОПОЛНИТЕЛЬНЫЙ СВЕТ НАВЕРХУ
+    // ДОПОЛНИТЕЛЬНЫЙ СВЕТ
     const highlightLight = new THREE.PointLight(0xffffff, 1.0, 500);
     highlightLight.position.set(0, 400, 0);
     scene.add(highlightLight);
 
-    // СОЗДАЕМ МАССИВ СПИРАЛЬНОГО РАСПРЕДЕЛЕНИЯ СФЕР
+    // ГЕНЕРАЦИЯ СФЕР
     const spheres = [];
     const baseRadius = 80;     
     const numSpheres = 30;
@@ -141,7 +141,7 @@
       scene.add(sphere);
     }
 
-    // АНАЛОГИЧНАЯ ФУНКЦИЯ АНИМАЦИИ
+    // АНИМАЦИЯ
     function animate() {
       requestAnimationFrame(animate);
 
@@ -155,12 +155,12 @@
       renderer.render(scene, camera);
     }
 
-    animate(); // Запускаем цикл анимации
+    animate(); // Запустим процесс анимации
 
-    // ОТОБРАЖЕНИЕ ФОНА ПРИ СКРОЛЛИНГЕ
+    // ОБРАБОТКА ПРОКРУТКИ
     document.addEventListener('scroll', handleScroll);
 
-    // Логика обработки прокрутки
+    // ЛОГИКА ПО РАБОТЕ С ПРОКРУТКОЙ
     function handleScroll() {
       const scrollY = window.scrollY || window.pageYOffset;
       const maxOpacity = 1;            
@@ -168,18 +168,18 @@
       const maxDistance = 500;         
       const blurAmount = 10;           
 
-      // Рассчитываем новое состояние фона
+      // Рассчитываем изменение прозрачности и позиции
       const currentOpacity = Math.max(minOpacity, maxOpacity - scrollY / maxDistance);
       const translateZValue = -(scrollY * 0.05); 
 
-      // Применяем стили
+      // Применяем фильтры к фону
       const bgImage = document.querySelector('.background-image');
       bgImage.style.filter = `blur(${blurAmount * (1 - currentOpacity)}px)`; 
       bgImage.style.transform = `translateZ(${translateZValue}px)`; 
       bgImage.style.opacity = `${currentOpacity}`;
     }
 
-    // ОБРАБОТЧИК РЕЗИСКЕЙЛА ОКНА
+    // ОБРАБОТКА ИЗМЕНЕНИЙ РАЗМЕРОВ ЭКРАНА
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
