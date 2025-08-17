@@ -31,7 +31,7 @@ scene.add(highlightLight);
 // Массив сфер
 const spheres = [];
 const baseRadius = 80;     
-const numSpheres = 100; // увеличиваем количество сфер
+const numSpheres = 3; // увеличиваем количество сфер
 
 for (let i = 0; i < numSpheres; i++) {
   let size = Math.random() * 2 + 1; // уменьшаем размер сфер до 1-3
