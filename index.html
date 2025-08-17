@@ -15,12 +15,13 @@
       overflow: hidden;
     }
 
-    .circle {
-      position: relative;
+    .orbit {
+      position: absolute;
       width: 500px;
       height: 500px;
-      border-radius: 50%;
-      animation: rotate 40s linear infinite;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
 
     .sphere {
@@ -39,54 +40,81 @@
       font-size: 48px;
       font-weight: bold;
       color: #333;
-      z-index: 2;
-    }
-
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      z-index: 10;
     }
   </style>
 </head>
 <body>
   <div class="text">Маникюр</div>
-  <div class="circle" id="circle"></div>
+  <div class="orbit" id="orbit"></div>
 
   <script>
-    const circle = document.getElementById('circle');
-    const numSpheres = 28;   // общее количество
-    const baseRadius = 200;  // базовый радиус круга
+    const orbit = document.getElementById('orbit');
+    const numSpheres = 25;     // количество шаров
+    const baseRadius = 200;    // базовый радиус
+    const spheres = [];
 
     for (let i = 0; i < numSpheres; i++) {
       const sphere = document.createElement('div');
       sphere.className = 'sphere';
 
-      // Случайный размер:
-      // 70% шаров от 15 до 50px
-      // 30% шаров очень большие (60–100px)
+      // Размеры: часть шаров большие
       let size;
       if (Math.random() < 0.3) {
-        size = Math.random() * 40 + 60; // большие
+        size = Math.random() * 40 + 60; // крупные
       } else {
         size = Math.random() * 35 + 15; // обычные
       }
       sphere.style.width = `${size}px`;
       sphere.style.height = `${size}px`;
 
-      // Угол с разбросом
+      orbit.appendChild(sphere);
+
+      // Спутники: шанс ~40% для больших шаров
+      const satellites = [];
+      if (size > 50 && Math.random() < 0.4) {
+        const sat = document.createElement('div');
+        sat.className = 'sphere';
+        const satSize = size * 0.3; // маленький спутник
+        sat.style.width = `${satSize}px`;
+        sat.style.height = `${satSize}px`;
+        orbit.appendChild(sat);
+        satellites.push(sat);
+      }
+
+      // параметры движения
       const angle = (i / numSpheres) * (2 * Math.PI) + (Math.random() * 0.5 - 0.25);
+      const radius = baseRadius + (Math.random() * 70 - 35);
+      const speed = 0.002 + Math.random() * 0.003; // скорость разная
 
-      // Радиус с сильным разбросом
-      const r = baseRadius + (Math.random() * 60 - 30);
-
-      const x = Math.cos(angle) * r + 250 - size/2;
-      const y = Math.sin(angle) * r + 250 - size/2;
-
-      sphere.style.left = `${x}px`;
-      sphere.style.top = `${y}px`;
-
-      circle.appendChild(sphere);
+      spheres.push({el: sphere, satellites, angle, radius, speed, size});
     }
+
+    function animate() {
+      spheres.forEach(obj => {
+        obj.angle += obj.speed; // разная скорость вращения
+
+        const x = Math.cos(obj.angle) * obj.radius + 250 - obj.size/2;
+        const y = Math.sin(obj.angle) * obj.radius + 250 - obj.size/2;
+
+        obj.el.style.left = `${x}px`;
+        obj.el.style.top = `${y}px`;
+
+        // спутники, если есть
+        obj.satellites.forEach((sat, idx) => {
+          const satAngle = obj.angle + 0.5; // спутник чуть сдвинут
+          const satRadius = obj.size * 0.8; // ближе к шару
+          const satX = x + Math.cos(satAngle) * satRadius;
+          const satY = y + Math.sin(satAngle) * satRadius;
+          sat.style.left = `${satX}px`;
+          sat.style.top = `${satY}px`;
+        });
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
   </script>
 </body>
 </html>
