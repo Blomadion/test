@@ -3,55 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Комбинированный эффект: сферы и блёр при прокрутке</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body, main {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
-      color: white;
-    }
-
-    .background-image {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: url('your_background_image.jpg'); /* Замените на свою картинку */
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      transition: filter 0.5s ease-in-out, transform 0.5s ease-in-out;
-      will-change: filter, transform;
-      z-index: -1;
-    }
-
-    main {
-      padding-top: 100px;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 3em;
-      margin-bottom: 20px;
-    }
-
-    p {
-      font-size: 1.5em;
-      line-height: 1.5;
-    }
-
-    canvas {
-      display: block;
-    }
-  </style>
+  <title>Эффекты фона и анимации</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <!-- Элемент фона -->
@@ -59,124 +12,17 @@
 
   <!-- Основной контент -->
   <main>
-    <h1>Сферы и эффект фона при прокрутке</h1>
-    <p>Просмотрите, как ведут себя анимированные сферы и как изменится фон при прокрутке страницы вниз.</p>
-    
-    <!-- Блок для принудительного увеличения длины страницы -->
-    <section style="height: 1000px;">Пространство для тестовой прокрутки страницы...</section>
+    <h1>Эффекты фона и анимации</h1>
+    <p>Проверка работы сфер и интерактивного фона.</p>
+    <section style="height: 1000px;">Пространство для прокрутки...</section>
   </main>
 
-  <!-- CANVAS для сфер -->
+  <!-- Canvas для сфер -->
   <canvas></canvas>
 
+  <!-- Подключение библиотек и скриптов -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-  <script>
-    // Создание сцены и камеры
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0xd9d9d9, 200, 450); 
-
-    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = 350;
-
-    // Рендерер
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0xd9d9d9, 1); 
-    document.body.appendChild(renderer.domElement);
-
-    // Свет
-    const ambient = new THREE.AmbientLight(0xffffff, 0.3);
-    scene.add(ambient);
-
-    const topLight = new THREE.DirectionalLight(0xffffff, 0.6);
-    topLight.position.set(0, 300, 200);
-    scene.add(topLight);
-
-    const subtleLight = new THREE.PointLight(0xffffff, 0.25);
-    subtleLight.position.set(-200, -150, 100);
-    scene.add(subtleLight);
-
-    // Верхний свет для бликов
-    const highlightLight = new THREE.PointLight(0xffffff, 1.0, 500);
-    highlightLight.position.set(0, 400, 0);
-    scene.add(highlightLight);
-
-    // Массив сфер
-    const spheres = [];
-    const baseRadius = 80;     
-    const numSpheres = 30;
-
-    for (let i = 0; i < numSpheres; i++) {
-      let size;
-      if (Math.random() < 0.3) {
-        size = Math.random() * 4 + 2;   
-      } else if (Math.random() < 0.6) {
-        size = Math.random() * 6 + 4;  
-      } else {
-        size = Math.random() * 8 + 6;  
-      }
-
-      const geometry = new THREE.SphereGeometry(size, 32, 32);
-      const material = new THREE.MeshStandardMaterial({
-        color: 0x000000,        
-        roughness: 0.1,          
-        metalness: 1.0,          
-        transparent: false       
-      });
-      const sphere = new THREE.Mesh(geometry, material);
-
-      const angle = (i / numSpheres) * Math.PI * 2 + (Math.random() * 0.4 - 0.2);
-      const radius = baseRadius + (Math.random() * 20 - 10); 
-      const speed = 0.0004 + Math.random() * 0.001;
-
-      spheres.push({ mesh: sphere, angle, radius, speed });
-      scene.add(sphere);
-    }
-
-    // Цикл анимации
-    function animate() {
-      requestAnimationFrame(animate);
-
-      spheres.forEach(s => {
-        s.angle += s.speed;
-        const x = Math.cos(s.angle) * s.radius;
-        const y = Math.sin(s.angle) * s.radius;
-        s.mesh.position.set(x, y, Math.sin(s.angle * 1.3) * 25);
-      });
-
-      renderer.render(scene, camera);
-    }
-
-    animate(); // Начинаем анимацию
-
-    // ОБРАБОТКА ПРОКРУТКИ
-    document.addEventListener('scroll', handleScroll);
-
-    // Функция обработки прокрутки
-    function handleScroll() {
-      const scrollY = window.scrollY || window.pageYOffset;
-      const maxOpacity = 1;            
-      const minOpacity = 0.2;          
-      const maxDistance = 500;         
-      const blurAmount = 10;           
-
-      // Расчёт нового уровня прозрачности и размытия
-      const currentOpacity = Math.max(minOpacity, maxOpacity - scrollY / maxDistance);
-      const translateZValue = -(scrollY * 0.05); 
-
-      // Применение фильтров к фону
-      const bgImage = document.querySelector('.background-image');
-      bgImage.style.filter = `blur(${blurAmount * (1 - currentOpacity)}px)`; 
-      bgImage.style.transform = `translateZ(${translateZValue}px)`; 
-      bgImage.style.opacity = `${currentOpacity}`;
-    }
-
-    // Обрабатываем изменение размеров окна
-    window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-  </script>
+  <script src="app.js"></script>
+  <script src="scroll.js"></script>
 </body>
 </html>
