@@ -1,37 +1,77 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Маникюр</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Эффекты фона и анимации</title>
   <style>
-    body {
+    * {
+      box-sizing: border-box;
+    }
+
+    body, main {
       margin: 0;
-      background: #d9d9d9; /* светло-серый фон */
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      padding: 0;
+      width: 100%;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
     }
-    #text {
-      position: absolute;
-      z-index: 10;
-      font-size: 48px;
-      font-weight: bold;
-      font-family: Arial, sans-serif;
-      color: #333;
+
+    .background-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('your_background_image.jpg'); /* Здесь ваше изображение */
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      transition: filter 0.5s ease-in-out, transform 0.5s ease-in-out;
+      will-change: filter, transform;
+      z-index: -1;
+    }
+
+    main {
+      padding-top: 100px;
       text-align: center;
-      pointer-events: none;
     }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.5em;
+      line-height: 1.5;
+    }
+
     canvas {
       display: block;
     }
   </style>
 </head>
 <body>
-  <div id="text">Маникюр</div>
+  <!-- Элемент фона -->
+  <div class="background-image"></div>
+
+  <!-- Основной контент -->
+  <main>
+    <h1>Привет!</h1>
+    <p>Пример комбинированного поведения с анимациями и изменением фона.</p>
+    
+    <!-- Для тестирования прокрутки добавляем секцию -->
+    <section style="height: 1000px;">Достаточно пространства для теста прокрутки...</section>
+  </main>
+
+  <!-- Canvas для трехмерных фигур -->
+  <canvas></canvas>
+
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
   <script>
+    // === ИНИЦИАЛИЗАЦИЯ SCENE, CAMERA, RENDERER ДЛЯ SFЕР === //
     const scene = new THREE.Scene();
 
     // --- Туман (Fog) ---
@@ -65,46 +105,44 @@
     subtleLight.position.set(-200, -150, 100);
     scene.add(subtleLight);
 
-    // Дополнительное верхнее освещение для усиления бликов
+    // Верхний свет для акцентирования бликов
     const highlightLight = new THREE.PointLight(0xffffff, 1.0, 500);
     highlightLight.position.set(0, 400, 0);
     scene.add(highlightLight);
 
-    // Сферы
+    // СФЕРЫ
     const spheres = [];
-    const baseRadius = 80;           // сохранён предыдущий радиус круга
+    const baseRadius = 80;       
     const numSpheres = 30;
 
     for (let i = 0; i < numSpheres; i++) {
       let size;
       if (Math.random() < 0.3) {
-        size = Math.random() * 4 + 2;   // мелкие фоновые
+        size = Math.random() * 4 + 2;   
       } else if (Math.random() < 0.6) {
-        size = Math.random() * 6 + 4;  // средние
+        size = Math.random() * 6 + 4;  
       } else {
-        size = Math.random() * 8 + 6;  // крупные
+        size = Math.random() * 8 + 6;  
       }
 
       const geometry = new THREE.SphereGeometry(size, 32, 32);
-      
-      // Создаем материал с характеристиками черного металла
       const material = new THREE.MeshStandardMaterial({
-        color: 0x000000,               // Глубокий черный цвет
-        roughness: 0.1,                // Минимальная шероховатость
-        metalness: 1.0,                // Полная металличность
-        transparent: false              // Отключаем прозрачность
+        color: 0x000000,        
+        roughness: 0.1,          
+        metalness: 1.0,          
+        transparent: false       
       });
       const sphere = new THREE.Mesh(geometry, material);
 
       const angle = (i / numSpheres) * Math.PI * 2 + (Math.random() * 0.4 - 0.2);
-      const radius = baseRadius + (Math.random() * 20 - 10); // Сохраняется тот же разброс радиусов
+      const radius = baseRadius + (Math.random() * 20 - 10); 
       const speed = 0.0004 + Math.random() * 0.001;
 
       spheres.push({ mesh: sphere, angle, radius, speed });
       scene.add(sphere);
     }
 
-    // Анимация
+    // Анимация сферами
     function animate() {
       requestAnimationFrame(animate);
 
@@ -118,9 +156,31 @@
       renderer.render(scene, camera);
     }
 
-    animate();
+    animate(); // запуск анимации
 
-    // Адаптив
+    // ==== ОБРАБОТКА ПРОКРУТКИ ПРИ ФОНЕ ===== //
+    document.addEventListener('scroll', handleScroll);
+
+    // Обработка прокрутки
+    function handleScroll() {
+      const scrollY = window.scrollY || window.pageYOffset;
+      const maxOpacity = 1;            
+      const minOpacity = 0.2;           
+      const maxDistance = 500;         
+      const blurAmount = 10;           
+
+      // Новая прозрачность и смещение согласно позиции прокрутки
+      const currentOpacity = Math.max(minOpacity, maxOpacity - scrollY / maxDistance);
+      const translateZValue = -(scrollY * 0.05); 
+
+      // Меняем свойства фона
+      const bgImage = document.querySelector('.background-image');
+      bgImage.style.filter = `blur(${blurAmount * (1 - currentOpacity)}px)`; 
+      bgImage.style.transform = `translateZ(${translateZValue}px)`; 
+      bgImage.style.opacity = `${currentOpacity}`;
+    }
+
+    // === АДАПТИВНОСТЬ === //
     window.addEventListener("resize", () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
