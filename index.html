@@ -6,7 +6,7 @@
   <style>
     body {
       margin: 0;
-      background: #e0e0e0; /* светло-серый фон */
+      background: #d9d9d9; /* светло-серый фон */
       overflow: hidden;
       display: flex;
       justify-content: center;
@@ -48,43 +48,48 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Свет
-    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+    // Свет — мягкий сверху
+    const ambient = new THREE.AmbientLight(0xffffff, 0.3); // мягкий общий свет
     scene.add(ambient);
-    const light = new THREE.PointLight(0xffffff, 1.2);
-    light.position.set(150, 200, 300);
-    scene.add(light);
+
+    const topLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    topLight.position.set(0, 300, 200); // свет сверху
+    scene.add(topLight);
+
+    const subtleLight = new THREE.PointLight(0xffffff, 0.2);
+    subtleLight.position.set(-200, -150, 100); // слабый боковой для легкого объёма
+    scene.add(subtleLight);
 
     // Сферы
     const spheres = [];
-    const baseRadius = 120;   // уменьшенный радиус
+    const baseRadius = 130;   // круг поменьше
     const numSpheres = 28;
 
     for (let i = 0; i < numSpheres; i++) {
-      // разные размеры: часть маленькие (фон), часть крупнее (передний план)
+      // разные размеры: фоновые и ближние
       let size;
       if (Math.random() < 0.3) {
-        size = Math.random() * 8 + 6;   // мелкие фоновые
+        size = Math.random() * 12 + 8;  // мелкие фоновые
       } else if (Math.random() < 0.6) {
-        size = Math.random() * 15 + 12; // средние
+        size = Math.random() * 18 + 14; // средние
       } else {
-        size = Math.random() * 20 + 20; // чуть крупнее
+        size = Math.random() * 22 + 20; // крупнее
       }
 
       const geometry = new THREE.SphereGeometry(size, 32, 32);
       const material = new THREE.MeshStandardMaterial({
-        color: 0x666666,  // серый
-        roughness: 1.0,   // матовые
+        color: 0x2e2e2e,   // тёмно-серый
+        roughness: 0.9,    // матовые
         metalness: 0.0,
         transparent: true,
-        opacity: size < 10 ? 0.5 : 1 // маленькие шары тусклее (фон)
+        opacity: size < 12 ? 0.5 : 0.8 // мелкие более прозрачные
       });
       const sphere = new THREE.Mesh(geometry, material);
 
-      // параметры орбиты
+      // параметры движения
       const angle = (i / numSpheres) * Math.PI * 2 + (Math.random() * 0.4 - 0.2);
-      const radius = baseRadius + (Math.random() * 40 - 20);
-      const speed = 0.001 + Math.random() * 0.002;
+      const radius = baseRadius + (Math.random() * 35 - 18);
+      const speed = 0.0005 + Math.random() * 0.0012; // плавные медленные движения
 
       spheres.push({ mesh: sphere, angle, radius, speed });
       scene.add(sphere);
@@ -98,7 +103,7 @@
         s.angle += s.speed;
         const x = Math.cos(s.angle) * s.radius;
         const y = Math.sin(s.angle) * s.radius;
-        s.mesh.position.set(x, y, Math.sin(s.angle * 1.5) * 20); // чуть глубины
+        s.mesh.position.set(x, y, Math.sin(s.angle * 1.2) * 15); // лёгкая глубина
       });
 
       renderer.render(scene, camera);
