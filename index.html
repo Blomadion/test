@@ -3,242 +3,83 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Металлические абстракции — минимализм</title>
+  <title>Металлические абстракции — плавающие формы</title>
   <style>
-    :root{
-      --bg:#f2f2f4;           /* нежно‑серый фон страницы */
-      --tile:#f6f6f8;         /* фон карточек (чуть светлее) */
-      --ink:#111;             /* текст */
-      --radius:24px;          /* скругления карточек */
-      --shadow:0 6px 24px rgba(0,0,0,.08);
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
     body{
-      margin:0; background:var(--bg); color:var(--ink);
-      font:500 16px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, Noto Sans, "Apple Color Emoji", "Segoe UI Emoji";
-      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+      margin:0; background:#f2f2f4; overflow:hidden;
+      height:100vh; display:flex; align-items:center; justify-content:center;
     }
-    header{
-      position:sticky; top:0; z-index:10; backdrop-filter:saturate(1.2) blur(6px);
-      background:linear-gradient(to bottom, rgba(242,242,244,.9), rgba(242,242,244,.6));
-      border-bottom:1px solid rgba(0,0,0,.06);
-    }
-    .wrap{max-width:980px; margin:0 auto; padding:18px 16px}
-    h1{font-size:22px; margin:0 0 6px}
-    p.sub{margin:0; opacity:.7; font-size:14px}
-
-    .grid{display:grid; gap:22px; padding:22px 16px 60px; max-width:980px; margin:0 auto}
-    /* 1 колонка на узких, 2 на средних, 3 на широких */
-    @media (min-width:520px){ .grid{ grid-template-columns:repeat(2, 1fr);} }
-    @media (min-width:900px){ .grid{ grid-template-columns:repeat(3, 1fr);} }
-
-    .tile{
-      position:relative; aspect-ratio:1/1; background:var(--tile);
-      border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;
-      display:flex; align-items:center; justify-content:center;
-      
-    }
-    .tile canvas{width:100%; height:100%; display:block}
-
-    /* маленькая кнопка обновления формы внутри карточки */
-    .refresh{
-      position:absolute; right:10px; top:10px; z-index:2; border:0; cursor:pointer;
-      background:rgba(255,255,255,.8); border-radius:999px; width:36px; height:36px;
-      box-shadow:0 4px 14px rgba(0,0,0,.12); display:grid; place-items:center;
-      transition:transform .12s ease; user-select:none;
-    }
-    .refresh:hover{ transform:scale(1.05) }
-    .refresh svg{ width:18px; height:18px }
-    .hint{ text-align:center; opacity:.55; font-size:13px; margin:14px 0 30px }
+    canvas{width:100%; height:100%; display:block}
   </style>
 </head>
 <body>
-<header>
-  <div class="wrap">
-    <h1>Металлические абстракции</h1>
-    <p class="sub">Минималистичные блестящие формы на нежно‑сером фоне. Скролль вниз — каждая карточка уникальна. Нажми ↻ на карточке, чтобы сгенерировать новую.</p>
-  </div>
-</header>
+<canvas id="c"></canvas>
 
-<main>
-  <div id="grid" class="grid"></div>
-  <p class="hint">Карточки лениво рендерятся при прокрутке, чтобы на телефоне всё было плавно.</p>
-</main>
-
-<!-- Three.js (модульная версия) -->
 <script type="module">
   import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
 
-  // === ПАРАМЕТРЫ ===
-  const COUNT = 18; // сколько карточек сделать
-  const DPR = Math.min(2, window.devicePixelRatio || 1);
+  const canvas = document.getElementById('c');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-  const grid = document.getElementById('grid');
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf2f2f4);
 
-  // Создаём карточки заранее (канвасы появятся, когда карточка войдёт в вьюпорт)
-  for (let i = 0; i < COUNT; i++) {
-    const tile = document.createElement('div');
-    tile.className = 'tile';
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
+  camera.position.set(0, 1.2, 8);
 
-    const btn = document.createElement('button');
-    btn.className = 'refresh';
-    btn.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="23 4 23 10 17 10"></polyline>
-        <polyline points="1 20 1 14 7 14"></polyline>
-        <path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10"></path>
-        <path d="M20.49 15A9 9 0 0 1 6.36 18.36L1 14"></path>
-      </svg>`;
-    tile.appendChild(btn);
+  // lights
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xaaaaaa, 0.9);
+  scene.add(hemi);
+  const dir1 = new THREE.DirectionalLight(0xffffff, 1.2);
+  dir1.position.set(5,6,5);
+  scene.add(dir1);
+  const dir2 = new THREE.DirectionalLight(0xffffff, 0.6);
+  dir2.position.set(-4,-3,-5);
+  scene.add(dir2);
 
-    grid.appendChild(tile);
-  }
+  // metallic material with reflections
+  const mat = new THREE.MeshPhysicalMaterial({
+    metalness: 1.0,
+    roughness: 0.05,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.08,
+    reflectivity: 1.0,
+    color: 0xffffff,
+    envMapIntensity: 1.0
+  });
 
-  // Ленивый рендер при входе карточки во вьюпорт
-  const io = new IntersectionObserver((entries)=>{
-    for(const e of entries){
-      if(e.isIntersecting){
-        initTile(e.target);
-        io.unobserve(e.target);
-      }
-    }
-  }, {rootMargin: '200px 0px', threshold: .2});
-
-  document.querySelectorAll('.tile').forEach(t => io.observe(t));
-
-  // === ФУНКЦИИ ===
-  function initTile(tile){
-    // если уже инициализировано — просто перегенерируем фигуру
-    if (tile.__dispose) { tile.__dispose(); }
-
-    const w = tile.clientWidth, h = tile.clientHeight;
-    const scene = new THREE.Scene();
-
-    // Нежно‑серый фон через туман — даёт мягкую картинку на границах
-    scene.fog = new THREE.Fog(0xf6f6f8, 8, 18);
-
-    const camera = new THREE.PerspectiveCamera(28, w / h, 0.1, 100);
-    camera.position.set(0, 0.4, 9);
-
-    const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, preserveDrawingBuffer:true });
-    renderer.setPixelRatio(DPR);
-    renderer.setSize(w, h, false);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-
-    // Вставляем canvas
-    tile.appendChild(renderer.domElement);
-
-    // Освещение, чтобы металл «зажил» без HDRI
-    const hemi = new THREE.HemisphereLight(0xffffff, 0x8899aa, 0.9);
-    scene.add(hemi);
-    const dir1 = new THREE.DirectionalLight(0xffffff, 1.0); dir1.position.set(3, 5, 4); scene.add(dir1);
-    const dir2 = new THREE.DirectionalLight(0xffffff, 0.6); dir2.position.set(-5, -2, -4); scene.add(dir2);
-    const rim = new THREE.PointLight(0xffffff, 0.6, 30); rim.position.set(0, 4, 8); scene.add(rim);
-
-    // Подложка-"подиум" (почти незаметный), помогает с отражениями
-    const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(40, 40),
-      new THREE.MeshStandardMaterial({ color: 0xf3f3f6, metalness: 0.0, roughness: 0.9 })
-    );
-    plane.rotation.x = -Math.PI/2; plane.position.y = -2.6; plane.receiveShadow = false; scene.add(plane);
-
-    // Сама «жидкометаллическая» форма
-    const mesh = buildMetalShape();
+  // add 3 floating shapes
+  const shapes = [];
+  for (let i=0;i<3;i++){
+    const geo = new THREE.TorusKnotGeometry(1.6+Math.random()*0.6, 0.4, 300, 24, Math.floor(Math.random()*4+2), Math.floor(Math.random()*5+3));
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set((i-1)*3.2, 0, 0);
     scene.add(mesh);
-
-    // Лёгкая анимация 1.5 сек ради бликов, затем — стоп (экономия батареи)
-    let t0 = performance.now();
-    let rafId = 0;
-    const loop = ()=>{
-      const t = (performance.now() - t0) / 1000;
-      mesh.rotation.x += 0.012;
-      mesh.rotation.y += 0.016;
-      renderer.render(scene, camera);
-      if (t < 1.6) rafId = requestAnimationFrame(loop);
-      else { cancelAnimationFrame(rafId); }
-    };
-    loop();
-
-    // кнопка ↻ перегенерирует форму
-    const btn = tile.querySelector('.refresh');
-    const onClick = ()=>{
-      scene.remove(mesh); mesh.geometry.dispose();
-      const m2 = buildMetalShape(); scene.add(m2);
-      // Мягкая перерисовка
-      t0 = performance.now(); loop();
-    };
-    btn.addEventListener('click', onClick);
-
-    // Resize
-    const onResize = ()=>{
-      const w2 = tile.clientWidth, h2 = tile.clientHeight;
-      renderer.setSize(w2, h2, false);
-      camera.aspect = w2 / h2; camera.updateProjectionMatrix();
-      renderer.render(scene, camera);
-    };
-    window.addEventListener('resize', onResize);
-
-    // сохранение для дальнейшей очистки
-    tile.__dispose = ()=>{
-      cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', onResize);
-      btn.removeEventListener('click', onClick);
-      renderer.dispose();
-      tile.querySelector('canvas')?.remove();
-    };
-
-    // --- helpers ---
-    function buildMetalShape(){
-      // Случайные параметры узла — даёт разные «ленточные» формы
-      const radius = rand(1.8, 2.6);
-      const tube   = rand(0.28, 0.48);
-      const tubular = 280;
-      const radial  = 20;
-      const p = Math.floor(rand(2, 5)); // число витков
-      const q = Math.floor(rand(3, 7)); // число перекрутов
-
-      const geo = new THREE.TorusKnotGeometry(radius, tube, tubular, radial, p, q);
-      // Немного «плавим» форму через вершинный шум
-      jiggle(geo, 0.12);
-
-      const mat = new THREE.MeshPhysicalMaterial({
-        metalness: 1.0,
-        roughness: 0.08,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.12,
-        reflectivity: 1.0,
-        sheen: 0.0,
-        color: 0xffffff
-      });
-      const m = new THREE.Mesh(geo, mat);
-      m.rotation.set(rand(0,Math.PI), rand(0,Math.PI), rand(0,Math.PI));
-      return m;
-    }
-
-    function jiggle(geometry, amp=0.1){
-      const pos = geometry.attributes.position;
-      for (let i = 0; i < pos.count; i++){
-        const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
-        const n = simplex3(x*.35, y*.35, z*.35); // псевдо-шум
-        pos.setXYZ(i, x + (n*amp), y + (n*amp), z + (n*amp));
-      }
-      pos.needsUpdate = true; geometry.computeVertexNormals();
-    }
-
-    function rand(min, max){ return Math.random()*(max-min)+min }
-
-    // очень лёгкий псевдо‑simplex (детерминированный, без зависимостей)
-    function simplex3(x,y,z){
-      const s = Math.sin, c = Math.cos;
-      return (
-        s(x*1.7 + c(z*0.7)) +
-        s(y*1.3 + c(x*0.6)) +
-        s(z*1.9 + c(y*0.8))
-      )/3;
-    }
+    shapes.push(mesh);
   }
+
+  // animate
+  function animate(){
+    requestAnimationFrame(animate);
+    const t = performance.now()/1000;
+    shapes.forEach((m,idx)=>{
+      m.rotation.x += 0.01*(idx+1);
+      m.rotation.y += 0.013*(idx+1);
+      m.position.y = Math.sin(t+idx)*0.8;
+    });
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize',()=>{
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+  });
 </script>
 </body>
 </html>
