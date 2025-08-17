@@ -6,7 +6,7 @@
   <style>
     body {
       margin: 0;
-      background: #d9d9d9; /* серый фон */
+      background: #cfcfcf; /* светло-серый фон */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,18 +17,18 @@
 
     .circle {
       position: relative;
-      width: 400px;
-      height: 400px;
+      width: 500px;
+      height: 500px;
       border-radius: 50%;
-      animation: rotate 30s linear infinite;
+      animation: rotate 40s linear infinite;
     }
 
     .sphere {
       position: absolute;
       background: #222; /* матовый черный */
       border-radius: 50%;
-      box-shadow: inset -5px -5px 10px rgba(0,0,0,0.4),
-                  inset 5px 5px 10px rgba(255,255,255,0.08);
+      box-shadow: inset -6px -6px 12px rgba(0,0,0,0.5),
+                  inset 6px 6px 12px rgba(255,255,255,0.08);
     }
 
     .text {
@@ -36,7 +36,7 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 42px;
+      font-size: 48px;
       font-weight: bold;
       color: #333;
       z-index: 2;
@@ -54,26 +54,33 @@
 
   <script>
     const circle = document.getElementById('circle');
-    const numSpheres = 25;   // кол-во шариков
-    const radius = 170;      // радиус окружности
+    const numSpheres = 28;   // общее количество
+    const baseRadius = 200;  // базовый радиус круга
 
     for (let i = 0; i < numSpheres; i++) {
       const sphere = document.createElement('div');
       sphere.className = 'sphere';
 
-      // Случайный размер (от маленьких до крупных)
-      const size = Math.random() * 35 + 15; 
+      // Случайный размер:
+      // 70% шаров от 15 до 50px
+      // 30% шаров очень большие (60–100px)
+      let size;
+      if (Math.random() < 0.3) {
+        size = Math.random() * 40 + 60; // большие
+      } else {
+        size = Math.random() * 35 + 15; // обычные
+      }
       sphere.style.width = `${size}px`;
       sphere.style.height = `${size}px`;
 
-      // Угол с небольшим случайным отклонением
-      const angle = (i / numSpheres) * (2 * Math.PI) + (Math.random() * 0.3 - 0.15);
+      // Угол с разбросом
+      const angle = (i / numSpheres) * (2 * Math.PI) + (Math.random() * 0.5 - 0.25);
 
-      // Радиус с небольшим разбросом (чтобы не было идеально)
-      const r = radius + (Math.random() * 20 - 10);
+      // Радиус с сильным разбросом
+      const r = baseRadius + (Math.random() * 60 - 30);
 
-      const x = Math.cos(angle) * r + 200 - size/2;
-      const y = Math.sin(angle) * r + 200 - size/2;
+      const x = Math.cos(angle) * r + 250 - size/2;
+      const y = Math.sin(angle) * r + 250 - size/2;
 
       sphere.style.left = `${x}px`;
       sphere.style.top = `${y}px`;
