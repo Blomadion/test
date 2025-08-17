@@ -65,14 +65,14 @@
     subtleLight.position.set(-200, -150, 100);
     scene.add(subtleLight);
 
-    // Добавляем новый источник света сверху для эффекта блика
+    // Дополнительное верхнее освещение для усиления бликов
     const highlightLight = new THREE.PointLight(0xffffff, 1.0, 500);
     highlightLight.position.set(0, 400, 0);
     scene.add(highlightLight);
 
     // Сферы
     const spheres = [];
-    const baseRadius = 80;       // Уменьшаем базовый радиус кругового движения
+    const baseRadius = 80;           // сохранён предыдущий радиус круга
     const numSpheres = 30;
 
     for (let i = 0; i < numSpheres; i++) {
@@ -86,17 +86,18 @@
       }
 
       const geometry = new THREE.SphereGeometry(size, 32, 32);
+      
+      // Создаем материал с характеристиками черного металла
       const material = new THREE.MeshStandardMaterial({
-        color: 0x6c6c6c,   // чуть более насыщенный серый цвет
-        roughness: 0.2,    // почти зеркальная поверхность
-        metalness: 0.5,    // добавляет приятный глянец
-        transparent: true,
-        opacity: size < 4 ? 0.45 : 0.8
+        color: 0x000000,               // Глубокий черный цвет
+        roughness: 0.1,                // Минимальная шероховатость
+        metalness: 1.0,                // Полная металличность
+        transparent: false              // Отключаем прозрачность
       });
       const sphere = new THREE.Mesh(geometry, material);
 
       const angle = (i / numSpheres) * Math.PI * 2 + (Math.random() * 0.4 - 0.2);
-      const radius = baseRadius + (Math.random() * 20 - 10); // уменьшили разброс радиусов
+      const radius = baseRadius + (Math.random() * 20 - 10); // Сохраняется тот же разброс радиусов
       const speed = 0.0004 + Math.random() * 0.001;
 
       spheres.push({ mesh: sphere, angle, radius, speed });
