@@ -1,28 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Эффекты фона и анимации</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nail Studio TURA</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #fff5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        h1 {
+            font-size: 3em;
+            margin: 0;
+            color: #ff6b88;
+            letter-spacing: 3px;
+        }
+        
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #d44d6e;
+        }
+        
+        .sections {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .section {
+            background-color: white;
+            padding: 30px;
+            width: 80%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #d44d6e;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 50px;
+            font-size: 1.2em;
+            color: #888;
+        }
+        
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .contact-form input, 
+        .contact-form textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .contact-form button {
+            background-color: #ff6b88;
+            color: white;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        
+        .contact-form button:hover {
+            background-color: #d44d6e;
+        }
+    </style>
 </head>
 <body>
-  <!-- Элемент фона -->
-  <div class="background-image"></div>
-
-  <!-- Основной контент -->
-  <main>
-    <h1>Эффекты фона и анимации</h1>
-    <p>Проверка работы сфер и интерактивного фона.</p>
-    <section style="height: 1000px;">Пространство для прокрутки...</section>
-  </main>
-
-  <!-- Canvas для сфер -->
-  <canvas></canvas>
-
-  <!-- Подключение библиотек и скриптов -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-  <script src="app.js"></script>
-  <script src="scroll.js"></script>
+    <div class="container">
+        <header>
+            <div class="logo">TURA</div>
+            <h1>NAIL STUDIO</h1>
+        </header>
+        
+        <div class="sections">
+            <div class="section">
+                <div class="section-title">НАШИ УСЛУГИ</div>
+                <p>Маникюр • Педикюр • Наращивание • Дизайн ногтей • Уход</p>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">КОНТАКТЫ</div>
+                <p>Телефон: +7 (123) 456-78-90</p>
+                <p>Адрес: ул. Красивых Ногтей, 15</p>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">ФОРМА ЗАПИСИ</div>
+                <form class="contact-form">
+                    <input type="text" placeholder="Ваше имя" required>
+                    <input type="tel" placeholder="Телефон" required>
+                    <input type="email" placeholder="Email">
+                    <textarea placeholder="Ваш комментарий" rows="4"></textarea>
+                    <button type="submit">ЗАПИСАТЬСЯ</button>
+                </form>
+            </div>
+        </div>
+        
+        <footer>
+            СПАСИБО, ЧТО ВЫБРАЛИ НАС!
+        </footer>
+    </div>
 </body>
 </html>
